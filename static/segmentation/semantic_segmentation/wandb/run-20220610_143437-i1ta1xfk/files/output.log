@@ -1,0 +1,29 @@
+INFO: Starting training:
+        Epochs:          5
+        Batch size:      1
+        Learning rate:   1e-05
+        Training size:   2
+        Validation size: 0
+        Checkpoints:     True
+        Device:          cpu
+        Images scaling:  0.5
+        Mixed Precision: True
+/Users/soo-jeongkim/opt/anaconda3/lib/python3.8/site-packages/torch/cuda/amp/grad_scaler.py:115: UserWarning: torch.cuda.amp.GradScaler is enabled, but CUDA is not available.  Disabling.
+  warnings.warn("torch.cuda.amp.GradScaler is enabled, but CUDA is not available.  Disabling.")
+Epoch 1/5:   0%|                                                                                                                     | 0/2 [00:00<?, ?img/s]/Users/soo-jeongkim/opt/anaconda3/lib/python3.8/site-packages/torch/cuda/amp/autocast_mode.py:117: UserWarning: torch.cuda.amp.autocast only affects CUDA ops, but CUDA is not available.  Disabling.
+  warnings.warn("torch.cuda.amp.autocast only affects CUDA ops, but CUDA is not available.  Disabling.")
+Epoch 1/5:   0%|                                                                                                                     | 0/2 [00:19<?, ?img/s]
+Traceback (most recent call last):
+  File "train.py", line 185, in <module>
+    train_net(net=net,
+  File "train.py", line 91, in train_net
+    loss = criterion(masks_pred, true_masks) \
+  File "/Users/soo-jeongkim/opt/anaconda3/lib/python3.8/site-packages/torch/nn/modules/module.py", line 889, in _call_impl
+    result = self.forward(*input, **kwargs)
+  File "/Users/soo-jeongkim/opt/anaconda3/lib/python3.8/site-packages/torch/nn/modules/loss.py", line 1047, in forward
+    return F.cross_entropy(input, target, weight=self.weight,
+  File "/Users/soo-jeongkim/opt/anaconda3/lib/python3.8/site-packages/torch/nn/functional.py", line 2690, in cross_entropy
+    return nll_loss(log_softmax(input, 1), target, weight, None, ignore_index, None, reduction)
+  File "/Users/soo-jeongkim/opt/anaconda3/lib/python3.8/site-packages/torch/nn/functional.py", line 2387, in nll_loss
+    ret = torch._C._nn.nll_loss2d(input, target, weight, _Reduction.get_enum(reduction), ignore_index)
+IndexError: Target 2 is out of bounds.

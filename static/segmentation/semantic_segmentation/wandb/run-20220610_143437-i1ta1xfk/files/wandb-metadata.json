@@ -1,0 +1,24 @@
+{
+    "os": "macOS-10.15.6-x86_64-i386-64bit",
+    "python": "3.8.5",
+    "heartbeatAt": "2022-06-10T13:34:44.222438",
+    "startedAt": "2022-06-10T13:34:37.612572",
+    "docker": null,
+    "cpu_count": 4,
+    "cuda": null,
+    "args": [
+        "--amp"
+    ],
+    "state": "running",
+    "program": "train.py",
+    "codePath": "static/segmentation/instance_segmentation/train.py",
+    "git": {
+        "remote": "https://github.com/soo-jeongkim/mphil_dissertation.git",
+        "commit": "9fa0286b5d0df55dfc15acc57c56a626335ab9a4"
+    },
+    "email": "soojeong.kim121@gmail.com",
+    "root": "/Users/soo-jeongkim/Documents/mphil_shape",
+    "host": "Soo-Jeongui-Air",
+    "username": "soo-jeongkim",
+    "executable": "/Users/soo-jeongkim/opt/anaconda3/bin/python"
+}

@@ -7,6 +7,9 @@ from pycocotools import mask
 from PIL import Image
 import numpy as np
 from matplotlib import pyplot as plt
+from matplotlib.collections import PatchCollection
+from matplotlib.patches import Polygon
+
 
 from skimage import measure
 from scipy import ndimage as ndi
@@ -20,7 +23,6 @@ img_ids = coco.getImgIds()
 cat_ids = coco.getCatIds()
 anns_ids = coco.getAnnIds(imgIds=img['id'], catIds=cat_ids, iscrowd=None)
 anns = coco.loadAnns(anns_ids) # load anno
-
 
 def coco_to_binary(annFile, output_dir):
     """
@@ -41,20 +43,17 @@ def coco_to_binary(annFile, output_dir):
         anns_ids = coco.getAnnIds(imgIds=img['id'], catIds=cat_ids, iscrowd=None) # get anno
         anns = coco.loadAnns(anns_ids) # load anno
 
-        mask = coco.annToMask(anns[0])
-
         for n in range(len(anns)):
             mask += coco.annToMask(anns[n])
     
         im = Image.fromarray(mask)
-        im.save(os.path.join(output_dir, img_fname))  
-    return
-
+        im.save(os.path.join(output_dir, img_fname), compression='deflate')
 
 def procAnns(anns):
   """
-  anns is the coco annotated json file - need to be registered to coco first
+  anns is the annotation file that you have to load to coco
   """
+  annotations = []
   if len(anns) ==0:
     return 0 
   if 'segmentation' in anns[0]: 
@@ -62,6 +61,7 @@ def procAnns(anns):
   else:
     raise Exception('datasetType not supported')
   if datasetType == 'instances':
+    polygons = []
     for ann in anns:
       if 'segmentation' in ann:
         if type(ann['segmentation']) == list:
@@ -86,7 +86,48 @@ def procAnns(anns):
             contour = np.flip(contour, axis=1)
             segmentation = contour.ravel().tolist()
           ann["segmentation"] = [segmentation]
-  return ann["segmentation"]
+  return anns # this will be all the annotations for each image_id
 
-# TODO get this image_ids in seg
-procAnns(anns)
+def visualise_anns(anns, draw_bbox=False):
+        """
+        Display the specified annotations same colour for each frame -> TODO change later
+        :param anns (array of object): annotations to display
+        :return: None
+        """
+        if len(anns) == 0:
+            return 0
+        if 'segmentation' in anns[0] or 'keypoints' in anns[0]:
+            datasetType = 'instances'
+        elif 'caption' in anns[0]:
+            datasetType = 'captions'
+        else:
+            raise Exception('datasetType not supported')
+        if datasetType == 'instances':
+            ax = plt.gca()
+            ax.set_autoscale_on(False)
+            polygons = []
+            color = []
+            c = (np.random.random((1, 3))*0.6+0.4).tolist()[0]
+            for ann in anns:
+                if 'segmentation' in ann:
+                    if type(ann['segmentation']) == list:
+                        # polygon
+                        for seg in ann['segmentation']:
+                            poly = np.array(seg).reshape((int(len(seg)/2), 2))
+                            polygons.append(Polygon(poly))
+                            color.append(c)
+
+                if draw_bbox:
+                    [bbox_x, bbox_y, bbox_w, bbox_h] = ann['bbox']
+                    poly = [[bbox_x, bbox_y], [bbox_x, bbox_y+bbox_h], [bbox_x+bbox_w, bbox_y+bbox_h], [bbox_x+bbox_w, bbox_y]]
+                    np_poly = np.array(poly).reshape((4,2))
+                    polygons.append(Polygon(np_poly))
+                    color.append(c)
+
+            p = PatchCollection(polygons, facecolor=color, linewidths=0, alpha=0.4)
+            ax.add_collection(p)
+            p = PatchCollection(polygons, facecolor='none', edgecolors=color, linewidths=2)
+            ax.add_collection(p)
+        elif datasetType == 'captions':
+            for ann in anns:
+                print(ann['caption'])
